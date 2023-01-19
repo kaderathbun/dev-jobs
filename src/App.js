@@ -1,25 +1,52 @@
-import logo from './logo.svg';
-import './App.css';
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import styled from 'styled-components'
+import { GlobalStyles } from './GobalStyles.styles'
+import { DataContext } from './contexts/DataContext.context'
+import { ThemeProvider } from 'styled-components'
+import { darkMode, lightMode } from './contexts/Theme.styles'
+import { useState } from 'react'
+import ScrollToTop from './utils/ScrollToTop.utils'
+
+// data
+import data from './data.json'
+
+// components
+import NavBar from './components/NavBar/NavBar.component'
+
+// pages
+import Home from './pages/Home/Home.component'
+import Details from './pages/Details/Details.component'
+
+const StyledApp = styled.div`
+  position: relative;
+  background-color: ${(props) => props.theme.body};
+`
 
 function App() {
+  const [theme, setTheme] = useState('light')
+  const isDarkMode = theme === 'dark'
+
+  const toggleTheme = () => {
+    setTheme(isDarkMode ? 'light' : 'dark')
+  }
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    <ThemeProvider theme={isDarkMode ? darkMode : lightMode}>
+      <DataContext.Provider value={{ data }}>
+        <GlobalStyles />
+        <StyledApp>
+          <BrowserRouter>
+            <NavBar toggleTheme={toggleTheme} />
+            <Routes>
+              <Route index path="/" element={<Home />} />
+              <Route path="/details/:itemId" element={<Details />} />
+            </Routes>
+            <ScrollToTop />
+          </BrowserRouter>
+        </StyledApp>
+      </DataContext.Provider>
+    </ThemeProvider>
+  )
 }
 
-export default App;
+export default App
